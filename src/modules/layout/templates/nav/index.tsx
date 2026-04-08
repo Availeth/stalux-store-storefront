@@ -52,7 +52,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky inset-x-0 top-0 z-50 border-b border-[#d8dfe8] bg-[#f4f6f8]">
-      <div className="bg-[#1f4678] py-2">
+      <div className="bg-[#c21d2e] py-2">
         <p className="text-center text-[12px] font-semibold uppercase tracking-[0.16em] text-white">
           Global Supplier - Expert Support - Fast Shipping
         </p>

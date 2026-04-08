@@ -1,7 +1,10 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
-import Product from "../product-preview"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import PlaceholderImage from "@modules/common/icons/placeholder-image"
+import Image from "next/image"
 
 type RelatedProductsProps = {
   product: HttpTypes.StoreProduct
@@ -46,24 +49,87 @@ export default async function RelatedProducts({
     return null
   }
 
+  const relatedProducts = products.slice(0, 4)
+
   return (
-    <div className="product-page-constraint">
-      <div className="flex flex-col items-center text-center mb-16">
-        <span className="text-base-regular text-gray-600 mb-6">
-          Related products
-        </span>
-        <p className="text-2xl-regular text-ui-fg-base max-w-lg">
-          You might also want to check out these products.
+    <section className="mb-8">
+      <div className="mb-8 flex items-end justify-between gap-4 border-b border-[#e3bebd]/25 pb-4">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#9e0027]">
+            Related Products
+          </p>
+          <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-[#1a1c1e] small:text-3xl">
+            Essential System Complements
+          </h2>
+        </div>
+        <p className="max-w-xs text-sm font-medium text-[#5b4040]">
+          Compatible modules and accessories selected from the same catalog
+          family.
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8">
-        {products.map((product) => (
-          <li key={product.id}>
-            <Product region={region} product={product} />
-          </li>
-        ))}
+      <ul className="grid grid-cols-1 gap-4 xsmall:grid-cols-2 small:grid-cols-4">
+        {relatedProducts.map((relatedProduct) => {
+          if (!relatedProduct.handle) {
+            return null
+          }
+
+          const { cheapestPrice } = getProductPrice({
+            product: relatedProduct,
+          })
+
+          const tagLabel = (
+            relatedProduct.tags?.[0] as { value?: string } | undefined
+          )?.value
+          const seriesLabel =
+            tagLabel ??
+            relatedProduct.collection?.title ??
+            relatedProduct.type?.value ??
+            "Accessory"
+          const productImage =
+            relatedProduct.thumbnail || relatedProduct.images?.[0]?.url
+
+          return (
+            <li key={relatedProduct.id}>
+              <LocalizedClientLink
+                href={`/products/${relatedProduct.handle}`}
+                className="group block h-full"
+              >
+                <article className="flex h-full flex-col bg-[#f3f3f6] p-5 transition-colors duration-200 hover:bg-[#e8e8ea]">
+                  <div className="relative mb-4 aspect-square overflow-hidden bg-white p-4">
+                    {productImage ? (
+                      <Image
+                        src={productImage}
+                        alt={relatedProduct.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="h-full w-full object-contain grayscale transition-all duration-300 group-hover:grayscale-0"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-[#9aa7b8]">
+                        <PlaceholderImage size={24} />
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9e0027]">
+                    {seriesLabel}
+                  </p>
+                  <h3 className="mt-2 text-sm font-black uppercase leading-tight tracking-[0.03em] text-[#1a1c1e]">
+                    {relatedProduct.title}
+                  </h3>
+
+                  <div className="mt-auto pt-4">
+                    <p className="text-lg font-black tracking-tight text-[#1a1c1e]">
+                      {cheapestPrice?.calculated_price || "Price on request"}
+                    </p>
+                  </div>
+                </article>
+              </LocalizedClientLink>
+            </li>
+          )
+        })}
       </ul>
-    </div>
+    </section>
   )
 }

@@ -22,22 +22,22 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   const filteredOptions = (option.values ?? []).map((v) => v.value)
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
-      <div
-        className="flex flex-wrap justify-between gap-2"
-        data-testid={dataTestId}
-      >
+    <div className="flex flex-col gap-y-2.5">
+      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-[#5b4040]">
+        {title}
+      </span>
+      <div className="flex flex-wrap gap-2" data-testid={dataTestId}>
         {filteredOptions.map((v) => {
           return (
             <button
               onClick={() => updateOption(option.id, v)}
               key={v}
+              type="button"
               className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
+                "min-h-10 min-w-[120px] rounded-md border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-colors",
                 {
-                  "border-ui-border-interactive": v === current,
-                  "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
+                  "border-[#c41e3a] bg-[#c41e3a] text-white": v === current,
+                  "border-[#d0d4d8] bg-[#f3f3f6] text-[#3f4348] hover:border-[#c41e3a] hover:text-[#9e0027]":
                     v !== current,
                 }
               )}

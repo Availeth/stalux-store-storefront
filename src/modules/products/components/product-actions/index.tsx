@@ -3,15 +3,19 @@
 import { addToCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
+import { Button, clx } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import { useParams, usePathname, useSearchParams } from "next/navigation"
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
-import { useRouter } from "next/navigation"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -90,7 +94,7 @@ export default function ProductActions({
     }
 
     router.replace(pathname + "?" + params.toString())
-  }, [selectedVariant, isValidVariant])
+  }, [isValidVariant, pathname, router, searchParams, selectedVariant])
 
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
@@ -119,6 +123,7 @@ export default function ProductActions({
   const actionsRef = useRef<HTMLDivElement>(null)
 
   const inView = useIntersection(actionsRef, "0px")
+  const hasMultipleVariants = (product.variants?.length ?? 0) > 1
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
@@ -137,10 +142,27 @@ export default function ProductActions({
 
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
-        <div>
-          {(product.variants?.length ?? 0) > 1 && (
-            <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-3" ref={actionsRef}>
+        <div className="rounded-2xl border border-[#e3bebd]/35 bg-white p-6 shadow-[0_24px_50px_-36px_rgba(26,28,30,0.6)]">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-[#e3bebd]/30 pb-4">
+            <span className="text-[10px] font-black uppercase tracking-[0.24em] text-[#5b4040]">
+              Configuration
+            </span>
+            <span
+              className={clx(
+                "px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]",
+                {
+                  "bg-[#e8f6ec] text-[#17763d]": inStock,
+                  "bg-[#ffdad6] text-[#93000a]": !inStock,
+                }
+              )}
+            >
+              {inStock ? "Ready to Ship" : "Out of Stock"}
+            </span>
+          </div>
+
+          {hasMultipleVariants && (
+            <div className="flex flex-col gap-y-5">
               {(product.options || []).map((option) => {
                 return (
                   <div key={option.id}>
@@ -158,30 +180,39 @@ export default function ProductActions({
               <Divider />
             </div>
           )}
+
+          <ProductPrice product={product} variant={selectedVariant} />
+
+          <Button
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              !isValidVariant
+            }
+            variant="primary"
+            className={clx(
+              "mt-6 h-12 w-full border-0 text-[11px] font-black uppercase tracking-[0.2em] text-white",
+              "bg-gradient-to-br from-[#9e0027] to-[#c41e3a] shadow-[0_16px_40px_-24px_rgba(158,0,39,0.8)] transition",
+              "hover:brightness-110 disabled:cursor-not-allowed disabled:bg-[#dadadc] disabled:text-[#7a7c7e] disabled:shadow-none"
+            )}
+            isLoading={isAdding}
+            data-testid="add-product-button"
+          >
+            {!selectedVariant
+              ? "Select Variant"
+              : !inStock || !isValidVariant
+              ? "Out of Stock"
+              : "Add to Cart"}
+          </Button>
+
+          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5b4040]">
+            Secure checkout • Global dispatch • OEM support
+          </p>
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
-
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          variant="primary"
-          className="w-full h-10"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !options
-            ? "Select variant"
-            : !inStock || !isValidVariant
-            ? "Out of stock"
-            : "Add to cart"}
-        </Button>
         <MobileActions
           product={product}
           variant={selectedVariant}
