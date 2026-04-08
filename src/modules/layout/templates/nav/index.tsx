@@ -70,9 +70,9 @@ export default async function Nav() {
                 <Image
                   src="/stalux-logo.png"
                   alt="Stalux Automation"
-                  width={256}
-                  height={256}
-                  className="h-14 w-auto small:h-20"
+                  width={1014}
+                  height={676}
+                  className="h-auto w-auto small:h-20 object-contain"
                   priority
                 />
               </LocalizedClientLink>

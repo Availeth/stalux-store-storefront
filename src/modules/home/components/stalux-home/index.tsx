@@ -1,19 +1,11 @@
 import { ShoppingCart } from "@medusajs/icons"
+import { getProductPrice } from "@lib/util/get-product-price"
+import { HttpTypes } from "@medusajs/types"
 import Link from "next/link"
 
 type StaluxHomeProps = {
   countryCode: string
-}
-
-type FeaturedComponent = {
-  badge: string
-  title: string
-  specA: { label: string; value: string }
-  specB: { label: string; value: string }
-  price: string
-  stock: "In Stock" | "Low Stock" | null
-  image: string
-  productPath: string
+  featuredProducts: HttpTypes.StoreProduct[]
 }
 
 const categoryLinks = [
@@ -24,57 +16,53 @@ const categoryLinks = [
   { label: "Sensors", href: "/store" },
 ]
 
-const featuredComponents: FeaturedComponent[] = [
-  {
-    badge: "Stalux V-Series",
-    title: "V-400 Vector Drive",
-    specA: { label: "Capacity", value: "15 kW / 20 HP" },
-    specB: { label: "Voltage", value: "380-480V" },
-    price: "$1,249.00",
-    stock: "In Stock",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBGukk6c8v3pVjNVnuU2LPPvAOG0CPHJLNhwuw14dpeVaV7HXh2MOLsZdsJNMSajTTAtuHq1vXcTgvJ-m-kCxbRDlPIZrymKubhOiBB42VPfzAo5acin-tRlMNjt2Bejas7olbtCkjHOZ1zrgSqJ-LCu3bSpdpfD6COQffL-iV5WDFwSAhaEWB_Yq_dnu_4Vg5_1F6_oeHjaBCax1MY5Jki1OAsWdBPXXnelZhsItVHZdqP4-E-R2ilBHAIHXxXucLShuS9g_S00vQD",
-    productPath: "/store",
-  },
-  {
-    badge: "Stalux Servo",
-    title: "S-200 Axis Controller",
-    specA: { label: "Response", value: "3.2 kHz" },
-    specB: { label: "Encoder", value: "24-bit Abs" },
-    price: "$890.00",
-    stock: "Low Stock",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBpi_MIulpzjnBEnshitlIRrkt-uLH56jvnDohLeTXQq5Tuti8yKrkXES5OruKougc7Foa43bnUvMrcNM0fMiMP7YW7nJLg0D6a6C0v388Iq3ek7XxPnwaJLIGOd_MXg_XHxHpQThyvExcnJ7hCiMiRXv8aA7XBcPd_l-PVe0gam5IBd3m1jEf3HdsJ2V6cZKRRIaRw2caGxrByDbtjFMWI5QNHK9nv3wZ7Q7i3Y9xj4OMQXExL6YjPA-OZXmLfSGs8FAbsgyQE4Hs4",
-    productPath: "/store",
-  },
-  {
-    badge: "Stalux Logic",
-    title: "X-10 Logic Modular",
-    specA: { label: "Memory", value: "10MB Logic" },
-    specB: { label: "I/O Count", value: "Up to 256" },
-    price: "$455.00",
-    stock: null,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCDFk-or2brEcSQdiBdhC8LmRbnVE27jgbeVNYnmG4nBNYHc5SNUnE7l2upop16_sn2NnsMStSjIVj4HUHvvq8xQrAJHlTG49gzz6Ei8Wrt_CsHZcoHuON5dLlbvdVLtUuHXev_mhu4lQ49nBdR9c4Ra4B4u_ynrR5VamGAVFDQDS2n-XBwPwGhpq0HUZlTfjqE_H6md-Ni-_PHwJWci8DoMYyKFugQAEUAfxAzEI_NmvzyMEampRCHTxNWTViF8sMHlK-aBX54g2bd",
-    productPath: "/store",
-  },
-  {
-    badge: "Stalux Power",
-    title: "P-Series PSU 40A",
-    specA: { label: "Output", value: "24V DC / 40A" },
-    specB: { label: "Efficiency", value: "94% Nom" },
-    price: "$210.00",
-    stock: null,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAA21oP4I_ajDQFIB9_6dnA6J7gopw6B5800qK9gbtp9TjFIIHUynTdy39XTuh2D93llGAyxHuvdbDfTXd5SXXBA1LyBn48MlCpWkPzwAllRRZSygsbES9o6Vaxi_m8GU2yy98JDFSC28eG7-S0UfVRPwVeC4FDRu_CcyRZLM-DPKz8-XphJMqMAGVEECvomvRmyqW5XLgUvHk_wZ72ixWS1MlH2rMV76TMAkaPbDBJuhR7L0_jcVh6PIQ7z6NSRBLemIWObnx1wizS",
-    productPath: "/store",
-  },
-]
 
 const withCountryCode = (countryCode: string, path: string) =>
   `/${countryCode}${path}`
 
-export default function StaluxHome({ countryCode }: StaluxHomeProps) {
+const getInventoryStatus = (
+  product: HttpTypes.StoreProduct
+): "In Stock" | "Low Stock" | "Out of Stock" | null => {
+  const variants = product.variants || []
+  const inventories = variants
+    .map((variant) =>
+      typeof variant?.inventory_quantity === "number"
+        ? variant.inventory_quantity
+        : null
+    )
+    .filter((quantity): quantity is number => quantity !== null)
+
+  if (!inventories.length) {
+    return null
+  }
+
+  const totalInventory = inventories.reduce((sum, value) => sum + value, 0)
+
+  if (totalInventory <= 0) {
+    return "Out of Stock"
+  }
+
+  if (totalInventory <= 5) {
+    return "Low Stock"
+  }
+
+  return "In Stock"
+}
+
+const getProductBadge = (product: HttpTypes.StoreProduct) => {
+  const tagName = product.tags?.[0]?.value || product.tags?.[0]?.name
+  return tagName || product.subtitle || "Stalux Component"
+}
+
+const getProductSku = (product: HttpTypes.StoreProduct) => {
+  const sku = product.variants?.[0]?.sku
+  return sku || "N/A"
+}
+
+export default function StaluxHome({
+  countryCode,
+  featuredProducts,
+}: StaluxHomeProps) {
   return (
     <main className="bg-[#f9f9fc] text-[#1a1c1e] pb-20">
       <div className="content-container py-8 md:py-12">
@@ -281,82 +269,111 @@ export default function StaluxHome({ countryCode }: StaluxHomeProps) {
                 </h2>
               </div>
 
-              <div className="grid gap-[1px] overflow-hidden rounded-xl bg-[#e3bebd]/30 sm:grid-cols-2 xl:grid-cols-4">
-                {featuredComponents.map((item) => {
-                  const stockStyles =
-                    item.stock === "Low Stock"
-                      ? "bg-[#ffdad6] text-[#93000a]"
-                      : "bg-[#e8e8ea] text-[#1a1c1e]"
+              {featuredProducts.length > 0 ? (
+                <div className="grid gap-[1px] overflow-hidden rounded-xl bg-[#e3bebd]/30 sm:grid-cols-2 xl:grid-cols-4">
+                  {featuredProducts.map((product) => {
+                    const image = product.thumbnail || product.images?.[0]?.url
+                    const productStatus = getInventoryStatus(product)
+                    const price = getProductPrice({ product }).cheapestPrice
+                    const stockStyles =
+                      productStatus === "Low Stock"
+                        ? "bg-[#ffdad6] text-[#93000a]"
+                        : productStatus === "Out of Stock"
+                          ? "bg-[#1a1c1e] text-white"
+                          : "bg-[#e8e8ea] text-[#1a1c1e]"
+                    const productHref = product.handle
+                      ? withCountryCode(
+                          countryCode,
+                          `/products/${product.handle}`
+                        )
+                      : withCountryCode(countryCode, "/store")
 
-                  return (
-                    <article
-                      key={item.title}
-                      className="flex h-full flex-col bg-white p-6 md:p-8"
-                    >
-                      <div className="relative mb-6 aspect-square">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="h-full w-full object-contain mix-blend-multiply"
-                        />
-                        {item.stock && (
-                          <span
-                            className={`absolute right-0 top-0 px-2 py-1 text-[9px] font-black uppercase tracking-wider ${stockStyles}`}
-                          >
-                            {item.stock}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex grow flex-col">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5b4040]">
-                          {item.badge}
-                        </p>
-                        <h3 className="mt-2 text-lg font-black uppercase tracking-tight text-[#1a1c1e]">
-                          {item.title}
-                        </h3>
-
-                        <div className="mt-5 grid grid-cols-2 gap-4 border-y border-[#e3bebd]/20 py-4">
-                          <div>
-                            <span className="block text-[9px] uppercase tracking-tight text-[#5b4040]">
-                              {item.specA.label}
+                    return (
+                      <article
+                        key={product.id}
+                        className="flex h-full flex-col bg-white p-6 md:p-8"
+                      >
+                        <div className="relative mb-6 aspect-square">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt={product.title}
+                              className="h-full w-full object-contain mix-blend-multiply"
+                            />
+                          ) : (
+                            <div className="h-full w-full rounded-lg bg-[#f3f3f6]" />
+                          )}
+                          {productStatus && (
+                            <span
+                              className={`absolute right-0 top-0 px-2 py-1 text-[9px] font-black uppercase tracking-wider ${stockStyles}`}
+                            >
+                              {productStatus}
                             </span>
-                            <span className="text-xs font-bold uppercase">
-                              {item.specA.value}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="block text-[9px] uppercase tracking-tight text-[#5b4040]">
-                              {item.specB.label}
-                            </span>
-                            <span className="text-xs font-bold uppercase">
-                              {item.specB.value}
-                            </span>
-                          </div>
+                          )}
                         </div>
 
-                        <div className="mt-6 flex items-end justify-between">
-                          <div>
-                            <span className="block text-[10px] uppercase tracking-[0.2em] text-[#5b4040]">
-                              Unit Price
-                            </span>
-                            <span className="text-2xl font-black tracking-tight text-[#1a1c1e]">
-                              {item.price}
-                            </span>
+                        <div className="flex grow flex-col">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5b4040]">
+                            {getProductBadge(product)}
+                          </p>
+                          <h3 className="mt-2 text-lg font-black uppercase tracking-tight text-[#1a1c1e]">
+                            {product.title}
+                          </h3>
+
+                          <div className="mt-5 grid grid-cols-2 gap-4 border-y border-[#e3bebd]/20 py-4">
+                            <div>
+                              <span className="block text-[9px] uppercase tracking-tight text-[#5b4040]">
+                                Variants
+                              </span>
+                              <span className="text-xs font-bold uppercase">
+                                {product.variants?.length || 0}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="block text-[9px] uppercase tracking-tight text-[#5b4040]">
+                                SKU
+                              </span>
+                              <span className="text-xs font-bold uppercase">
+                                {getProductSku(product)}
+                              </span>
+                            </div>
                           </div>
-                          <Link
-                            href={withCountryCode(countryCode, item.productPath)}
-                            className="inline-flex h-11 w-11 items-center justify-center bg-[#1a1c1e] text-white transition hover:bg-[#c41e3a]"
-                            aria-label={`Shop ${item.title}`}
-                          >
-                            <ShoppingCart className="h-5 w-5" />
-                          </Link>
+
+                          <div className="mt-6 flex items-end justify-between">
+                            <div>
+                              <span className="block text-[10px] uppercase tracking-[0.2em] text-[#5b4040]">
+                                Unit Price
+                              </span>
+                              <span className="text-2xl font-black tracking-tight text-[#1a1c1e]">
+                                {price?.calculated_price || "Contact Sales"}
+                              </span>
+                            </div>
+                            <Link
+                              href={productHref}
+                              className="inline-flex h-11 w-11 items-center justify-center bg-[#1a1c1e] text-white transition hover:bg-[#c41e3a]"
+                              aria-label={`Shop ${product.title}`}
+                            >
+                              <ShoppingCart className="h-5 w-5" />
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-xl bg-white p-8">
+                  <p className="text-sm font-medium text-[#5b4040]">
+                    No featured products are available in the current region.
+                  </p>
+                  <Link
+                    href={withCountryCode(countryCode, "/store")}
+                    className="mt-4 inline-flex text-xs font-black uppercase tracking-[0.2em] text-[#c41e3a] transition hover:text-[#9e0027]"
+                  >
+                    Browse Catalog
+                  </Link>
+                </div>
+              )}
             </section>
 
             <section className="relative overflow-hidden rounded-2xl bg-[#c41e3a] p-8 text-white md:p-12">

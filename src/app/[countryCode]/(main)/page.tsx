@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 
+import { listProducts } from "@lib/data/products"
 import StaluxHome from "@modules/home/components/stalux-home"
 
 export const metadata: Metadata = {
@@ -14,5 +15,16 @@ export default async function Home(props: {
   const params = await props.params
   const { countryCode } = params
 
-  return <StaluxHome countryCode={countryCode} />
+  const {
+    response: { products: featuredProducts },
+  } = await listProducts({
+    countryCode,
+    queryParams: {
+      limit: 4,
+    },
+  })
+
+  return (
+    <StaluxHome countryCode={countryCode} featuredProducts={featuredProducts} />
+  )
 }
