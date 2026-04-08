@@ -1,41 +1,18 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
-import Hero from "@modules/home/components/hero"
-import { listCollections } from "@lib/data/collections"
-import { getRegion } from "@lib/data/regions"
+import StaluxHome from "@modules/home/components/stalux-home"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
+  title: "Stalux Automation | Precision Components",
   description:
-    "A performant frontend ecommerce starter template with Next.js 15 and Medusa.",
+    "Industrial automation storefront for Stalux precision motion control systems.",
 }
 
 export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) {
   const params = await props.params
-
   const { countryCode } = params
 
-  const region = await getRegion(countryCode)
-
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
-
-  if (!collections || !region) {
-    return null
-  }
-
-  return (
-    <>
-      <Hero />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
-    </>
-  )
+  return <StaluxHome countryCode={countryCode} />
 }
