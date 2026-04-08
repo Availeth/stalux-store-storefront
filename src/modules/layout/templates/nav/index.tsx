@@ -53,18 +53,18 @@ export default async function Nav() {
   return (
     <div className="sticky inset-x-0 top-0 z-50 border-b border-[#d8dfe8] bg-[#f4f6f8]">
       <div className="bg-[#c21d2e] py-2">
-        <p className="text-center text-[12px] font-semibold uppercase tracking-[0.16em] text-white">
+        <p className="px-4 text-center text-[10px] font-semibold uppercase leading-snug tracking-[0.12em] text-white xsmall:text-[11px] small:text-[12px]">
           Global Supplier - Expert Support - Fast Shipping
         </p>
       </div>
 
       <header className="bg-[#f4f6f8]">
-        <div className="content-container py-4 small:py-5">
+        <div className="content-container py-3 xsmall:py-4 small:py-5">
           <nav className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 small:gap-5">
+            <div className="flex flex-wrap items-center gap-3 small:gap-5">
               <LocalizedClientLink
                 href="/"
-                className="shrink-0"
+                className="block w-[8.75rem] shrink-0 xsmall:w-[10.5rem] small:w-auto"
                 data-testid="nav-store-link"
               >
                 <Image
@@ -72,7 +72,8 @@ export default async function Nav() {
                   alt="Stalux Automation"
                   width={1014}
                   height={676}
-                  className="h-auto w-auto small:h-20 object-contain"
+                  sizes="(max-width: 511px) 140px, (max-width: 1023px) 168px, 224px"
+                  className="h-auto w-full object-contain small:h-20 small:w-auto"
                   priority
                 />
               </LocalizedClientLink>
@@ -87,13 +88,13 @@ export default async function Nav() {
                 <MagnifyingGlass className="h-10 w-10 text-[#1b3f73]" />
               </LocalizedClientLink>
 
-              <div className="ml-auto flex items-center gap-3 small:gap-6 text-[#1b3f73]">
+              <div className="ml-auto flex shrink-0 items-center gap-2 xsmall:gap-3 small:gap-6 text-[#1b3f73]">
                 <div className="h-full">
                   <SideMenu
                     regions={regions}
                     locales={locales}
                     currentLocale={currentLocale}
-                    className="gap-2 text-sm font-semibold uppercase tracking-[0.04em] text-[#1b3f73] hover:text-[#122d55]"
+                    className="gap-1 text-xs font-semibold uppercase tracking-[0.04em] text-[#1b3f73] hover:text-[#122d55] xsmall:gap-2 xsmall:text-sm"
                   />
                 </div>
                 <LocalizedClientLink
@@ -101,17 +102,17 @@ export default async function Nav() {
                   href="/account"
                   data-testid="nav-account-link"
                 >
-                  <User className="h-8 w-8" />
+                  <User className="h-7 w-7 xsmall:h-8 xsmall:w-8" />
                   <span className="hidden small:inline">Account</span>
                 </LocalizedClientLink>
                 <Suspense
                   fallback={
                     <LocalizedClientLink
-                      className="relative inline-flex h-10 w-10 items-center justify-center text-[#1b3f73] transition-colors duration-200 hover:text-[#122d55]"
+                      className="relative inline-flex h-9 w-9 items-center justify-center text-[#1b3f73] transition-colors duration-200 hover:text-[#122d55] xsmall:h-10 xsmall:w-10"
                       href="/cart"
                       data-testid="nav-cart-link"
                     >
-                      <ShoppingCart className="h-8 w-8" />
+                      <ShoppingCart className="h-7 w-7 xsmall:h-8 xsmall:w-8" />
                       <span className="absolute -right-1 -top-1 inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-[#d51f36] px-1 text-[10px] font-bold leading-none text-white">
                         0
                       </span>
@@ -126,12 +127,12 @@ export default async function Nav() {
 
             <LocalizedClientLink
               href="/store"
-              className="flex items-center justify-between border-[3px] border-[#d0d8e2] bg-white px-4 py-3 text-[#546684] shadow-sm transition-colors duration-200 hover:border-[#b9c6d6] medium:hidden"
+              className="flex items-center justify-between gap-3 border-[3px] border-[#d0d8e2] bg-white px-4 py-3 text-[#546684] shadow-sm transition-colors duration-200 hover:border-[#b9c6d6] medium:hidden"
             >
-              <span className="text-base font-medium">
+              <span className="truncate text-sm font-medium xsmall:text-base">
                 Search staluxautomation.com
               </span>
-              <MagnifyingGlass className="h-7 w-7 text-[#1b3f73]" />
+              <MagnifyingGlass className="h-6 w-6 shrink-0 text-[#1b3f73] xsmall:h-7 xsmall:w-7" />
             </LocalizedClientLink>
           </nav>
         </div>
@@ -139,12 +140,12 @@ export default async function Nav() {
 
       <div className="bg-[#f4f6f8]">
         <div className="content-container border-t border-[#d8dfe8]">
-          <ul className="flex items-center gap-6 overflow-x-auto py-4 text-[#1b3f73] no-scrollbar">
+          <ul className="flex items-center gap-4 overflow-x-auto py-3 text-[#1b3f73] no-scrollbar xsmall:gap-6 xsmall:py-4">
             {headerHighlights.map(({ label, Icon }) => {
               return (
                 <li
                   key={label}
-                  className="flex shrink-0 items-center gap-2 whitespace-nowrap text-[1.03rem] font-semibold"
+                  className="flex shrink-0 items-center gap-2 whitespace-nowrap text-sm font-semibold xsmall:text-[1.03rem]"
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span>{label}</span>

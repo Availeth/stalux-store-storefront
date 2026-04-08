@@ -83,11 +83,11 @@ const CartDropdown = ({
       <Popover className="relative h-full">
         <PopoverButton className="h-full flex items-center">
           <LocalizedClientLink
-            className="relative inline-flex h-10 w-10 items-center justify-center text-[#1b3f73] transition-colors duration-200 hover:text-[#122d55]"
+            className="relative inline-flex h-9 w-9 items-center justify-center text-[#1b3f73] transition-colors duration-200 hover:text-[#122d55] xsmall:h-10 xsmall:w-10"
             href="/cart"
             data-testid="nav-cart-link"
           >
-            <ShoppingCart className="h-8 w-8" />
+            <ShoppingCart className="h-7 w-7 xsmall:h-8 xsmall:w-8" />
             <span className="absolute -right-1 -top-1 inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-[#d51f36] px-1 text-[10px] font-bold leading-none text-white">
               {totalItems}
             </span>
