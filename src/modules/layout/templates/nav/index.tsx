@@ -64,7 +64,7 @@ export default async function Nav() {
             <div className="flex flex-wrap items-center gap-3 small:gap-5">
               <LocalizedClientLink
                 href="/"
-                className="block w-[8.75rem] shrink-0 xsmall:w-[10.5rem] small:w-auto"
+                className="block w-[8.75rem] shrink-0 xsmall:w-[10.5rem] small:w-[14rem]"
                 data-testid="nav-store-link"
               >
                 <Image
@@ -73,7 +73,7 @@ export default async function Nav() {
                   width={1014}
                   height={676}
                   sizes="(max-width: 511px) 140px, (max-width: 1023px) 168px, 224px"
-                  className="h-auto w-full object-contain small:h-20 small:w-auto"
+                  className="h-auto w-full object-contain"
                   priority
                 />
               </LocalizedClientLink>
