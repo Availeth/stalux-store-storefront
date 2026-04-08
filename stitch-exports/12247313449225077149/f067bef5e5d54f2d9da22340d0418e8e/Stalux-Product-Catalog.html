@@ -1,0 +1,379 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#9cf1ed",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#2f3133",
+                    "surface": "#f9f9fc",
+                    "tertiary": "#005754",
+                    "surface-container": "#eeeef0",
+                    "surface-bright": "#f9f9fc",
+                    "on-tertiary-container": "#9cf2ed",
+                    "surface-variant": "#e2e2e5",
+                    "on-secondary-fixed": "#40000a",
+                    "inverse-primary": "#ffb3b4",
+                    "on-error": "#ffffff",
+                    "secondary": "#9f3e45",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "outline-variant": "#e3bebd",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#e8e8ea",
+                    "on-secondary-fixed-variant": "#80272f",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#40000a",
+                    "secondary-fixed": "#ffdad9",
+                    "background": "#f9f9fc",
+                    "inverse-on-surface": "#f0f0f3",
+                    "primary-fixed": "#ffdad9",
+                    "primary": "#9e0027",
+                    "tertiary-container": "#00716e",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f3f3f6",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e2e2e5",
+                    "on-tertiary-fixed-variant": "#00504d",
+                    "on-tertiary-fixed": "#00201f",
+                    "primary-container": "#c41e3a",
+                    "on-surface": "#1a1c1e",
+                    "on-primary-container": "#ffdada",
+                    "primary-fixed-dim": "#ffb3b4",
+                    "on-primary-fixed-variant": "#920023",
+                    "on-background": "#1a1c1e",
+                    "surface-tint": "#ba1434",
+                    "surface-dim": "#dadadc",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ff888d",
+                    "on-surface-variant": "#5b4040",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#80d5d1",
+                    "outline": "#8f6f6f",
+                    "on-secondary-container": "#761f28"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none flex items-center justify-between px-8 h-20 w-full">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<img alt="Stalux Automation Logo" class="h-8 w-auto" data-alt="minimalist professional industrial logo for Stalux Automation with clean geometric lines in deep charcoal and red" src="https://www.staluxautomation.com/stalux-logo.svg" style="">
+<span class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase" style="">Stalux Automation</span>
+</div>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-red-600 transition-colors duration-200" href="#" style="">Solutions</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-red-600 transition-colors duration-200" href="#" style="">Support</a>
+<a class="text-red-700 dark:text-red-500 font-bold border-b-2 border-red-700" href="#" style="">Catalogue</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<input class="bg-surface-container border-none text-sm px-4 py-2 w-64 rounded-sm focus:ring-1 focus:ring-primary-container" placeholder="Search components..." type="text">
+<span class="material-symbols-outlined absolute right-3 top-2 text-slate-400 text-sm" style="">search</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="scale-95 active:scale-90 transition-transform" style=""><span class="material-symbols-outlined text-slate-700" style="">shopping_cart</span></button>
+<button class="scale-95 active:scale-90 transition-transform" style=""><span class="material-symbols-outlined text-slate-700" style="">account_circle</span></button>
+</div>
+</div>
+</nav>
+<main class="pt-20 flex min-h-screen">
+<!-- SideNavBar / Filters -->
+<aside class="h-screen w-72 sticky top-20 bg-slate-50 dark:bg-slate-950 flex flex-col py-6 px-4 space-y-1 overflow-y-auto">
+<div class="mb-8 px-4">
+<h2 class="text-sm font-medium tracking-wide uppercase Inter text-slate-400" style="">Product Categories</h2>
+<p class="text-xs text-slate-400" style="">Machined Precision</p>
+</div>
+<div class="space-y-1 mb-10">
+<a class="flex items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-800 text-red-700 dark:text-red-400 rounded-sm font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">settings_input_component</span> AC Drives
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 transition-all font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">precision_manufacturing</span> Servo Drives
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 transition-all font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">developer_board</span> PLCs &amp; HMIs
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 transition-all font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">sensors</span> Sensors
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 transition-all font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">bolt</span> Power Supplies
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 transition-all font-medium tracking-wide uppercase text-sm" href="#" style="">
+<span class="material-symbols-outlined" style="">settings_ethernet</span> Cables
+                </a>
+</div>
+<div class="border-t border-slate-200 pt-8 px-4 space-y-6">
+<div>
+<h3 class="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-4" style="">Voltage Range</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer" style="">
+<input class="rounded-none text-primary focus:ring-primary border-slate-300" type="checkbox"> 24V DC
+                        </label>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer" style="">
+<input class="rounded-none text-primary focus:ring-primary border-slate-300" type="checkbox"> 230V AC
+                        </label>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer" style="">
+<input checked="" class="rounded-none text-primary focus:ring-primary border-slate-300" type="checkbox"> 480V AC
+                        </label>
+</div>
+</div>
+<div>
+<h3 class="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-4" style="">IP Protection</h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-[10px] font-bold text-slate-600 rounded-sm" style="">IP20</span>
+<span class="px-2 py-1 bg-primary-container text-[10px] font-bold text-white rounded-sm" style="">IP65</span>
+<span class="px-2 py-1 bg-surface-container text-[10px] font-bold text-slate-600 rounded-sm" style="">IP67</span>
+</div>
+</div>
+<div>
+<h3 class="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-4" style="">Availability</h3>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer" style="">
+<input class="rounded-none text-primary focus:ring-primary border-slate-300" type="checkbox"> In Stock Only
+                    </label>
+</div>
+</div>
+</aside>
+<!-- Product Grid Canvas -->
+<section class="flex-1 bg-surface p-8">
+<!-- Catalogue Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<span class="text-[10px] font-mono tracking-[0.3em] uppercase text-primary mb-2 block" style="">System Inventory v4.1</span>
+<h1 class="text-5xl font-black tracking-tighter text-on-surface uppercase leading-none" style="">Industrial Catalog</h1>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-2 rounded-sm">
+<span class="text-[10px] font-bold uppercase text-slate-500 pl-2" style="">Sort By:</span>
+<select class="bg-transparent border-none text-xs font-bold uppercase focus:ring-0 text-slate-900 cursor-pointer">
+<option>Technical Spec</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Newest Release</option>
+</select>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+<!-- Product Card 1 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="S-Series Vector Inverter" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="high-end industrial vector frequency inverter with digital display and cooling fins, studio lighting on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmJa96ziLtqGOiHfmLJsQyzBrYxxo5nnTYst_xU3gLZGFrVP4KXvkRikYoCLtM_LBEL1CiJyja9NRnGOxCCL7LrbL0ksX0V8YeA6d0dS9MvlEF3BvMJsUsGGaGQrFt_GIsQ0T5NOAvkby5NIm8-FR0x38Z_KLeqVyxoKdae_jSPbblXu3EE_1lWviZayc6dDYhi8TnRdQ6p-gn_uiPpVdYmm18A8mvmWFZqD_FDOk3psA4NWIPchzsQR30WdsK5t2GaRJCeLuZXDcT" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">S-Series</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">Vector Frequency Inverter</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">1.5kW / 480V Three-Phase</span>
+<span class="text-xs font-medium text-slate-700" style="">3.2kHz Carrier Frequency</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$1,249.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="V-Series Servo Motor" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="brushed metal industrial servo motor with precise wiring connectors, high-resolution photography, industrial tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJzfmtyX5kKH_Ulg3NTFtJebu0oITleNIAK78NvWPCAqMZStG0_CTTO8Or7rgUwsI7Dgf7-26Ugf47o1wbZtU4UTh-UA117P4C8tRhvt4Qs0j2a7mswI6tx2__GPIHUaVZ8iLfwZb_K9ldiwSBUMJMOkv-q3modUWpFCepi8_ZkWi4S5b2XeW8B8nR6QtnLam97VWY7NnOr_sT88YzFtY4lfuby-5r2sS3ZU1ZtIpIorykU_ILt-TfPvx-74rKB2TokNbS0rVfQ-Ud" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">V-Series</span>
+<span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold uppercase tracking-tighter" style="">Lead Time: 2 Weeks</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">High-Torque Servo Motor</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">4.5Nm / 3000 RPM</span>
+<span class="text-xs font-medium text-slate-700" style="">IP65 Rated Housing</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$890.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Nexus HMI Terminal" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="industrial touch screen HMI panel with aluminum bezel, clean UI shown on screen, sharp focus on hardware details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKn3dWOHoTbPBCrcc53h0smagZfNU01k0UuwB4lBkiuF72PLj5GVngItXkbJbcca6Xg_zeMMvRAMta-n-s_ybQRUrY9yQ-X_UujmEnPG2AoMCJlKPq24_vsJIoafVZykW14IzE8-Lp6lNAhId0ViqbMfoKnyqHj3n2RDeFpyko8Xo2pqzHJjYHugYfRj6tkbz80285Wk7wBYJmdTMgtc0hIvlRr1nkxTxoc_VzuxJZ3fEkcIJsTLgzr8uOz6cCjH-GclethuDob7T9" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Nexus</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">10" Multi-Touch HMI</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">1024x768 IPS Display</span>
+<span class="text-xs font-medium text-slate-700" style="">Ethernet/IP &amp; Profinet</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$2,100.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Titan PLC Core" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="compact industrial PLC controller unit with LED indicators and DIN rail mount, high tech components, sharp industrial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWhTbemT1R-DrJ0W6OTZc9lLLtemjAlRepL32wPb0beOXIQjebQ4RfLaIIQGsOzGPAwJIUfA8Alt2w-8ZrDK5q1XMdxHKhPTtWGgY6aF57yEXUBKWnuFwMY2a3BliF1Mk1YRh-M97GtWb7J2rie1inX9tv57mq9X9I1ErhX7oXsJfdEuk4SeIbduoCQjYqeW1unR2upqKQXVcHl_Rn9Mmyb5TWa8nyiX3c-f4YP398brCsc3H6zhK1k3uTgJ-ww-1vSu54-MoUOu3t" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Titan</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">Expandable PLC Core</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">32 Digital I/O Points</span>
+<span class="text-xs font-medium text-slate-700" style="">0.01ms Processing Speed</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$1,450.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Power Supply" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="rugged industrial power supply unit with heat sink vents, 24V DC labels, studio lighting on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNXYkIHfIYQV_-QbizaUPKUyWQ_05atoNZg0OPrAxSDtprodWkksNtXVBchNVo72bC1XD0vUrZSBpb82NGqoSw8ZebMUuC_iykLU2B4s9P7PkB3gxlPcIToXNQqDQHyiE6xpvkHnXcCZyW25qyPeQH5M5GyZOjnz_hnrzxSEqh9zY1Ba-btgCZFEnB61sTL5dLGgxf3ZjZ-kSSLFPuaoDnSLh33VFSGleVJp3gpZiEEDWewSPfhN4HXrL7up3-jDljlFr01xcN4TUo" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Volt-X</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">DIN Rail Power Supply</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">480W / 24V 20A Output</span>
+<span class="text-xs font-medium text-slate-700" style="">PFC Function Integration</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$325.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 6 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Pro-Sense Laser" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="precision laser distance sensor with stainless steel housing and digital calibration interface, extreme close up, sharp detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASf8wwntbAXHPFMO5MybE5EvPu2HOhiDmBRTCOy2yXGx3dD9-CpFA9jnJ1sKdsTFeVNQZg8SsDsLtZ9cSJTNrcem3KqWOK3l-X0nl0mnNDr1k5L0vJDJc2SrttOlLRX7S96rXdz3KBPTYCSnh1D7fajOs4Klo5Br3OhwOKLCCOE-CydGcsvspt3n_bvKAbHfeUU-OczBdcL8kRGXzAo1_jtVxYb9eAlhQ1Xjp3NdNr3Nc18WflDQvwudF8EvTMQW9HIuDlR0oGIfar" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Pro-Sense</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">Laser Distance Sensor</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">0.1mm - 50m Range</span>
+<span class="text-xs font-medium text-slate-700" style="">IP67 Waterproof Housing</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$640.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 7 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Stalux Connectivity" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="heavy duty industrial M12 ethernet cable with gold plated pins and orange shielding, high quality studio macro photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUQPDinBaYiUVma7Gh5cx_tO9QsOFJi2PIl2s-HuT0enJMFQ3EbVP5cIDc1VB6unWb04AUO8aFHnu8WlQHaUfgwXfg6eKa96IHp7VwkNh3gT3J8rNSaq97ogy7uVnducDdXYSJ5T6RRdHEIr2Q3PAbJtDv8n2R_DJAhQ8jKzXNteNl9DYeQnDLBDOo_3bVEKdk1lyJxFDF9nHbYr9f4BCeP7Pepr8RLv7_rT0VQsMNSiAizurW7zjDcC0JjC91N9W7TdvuAJq-NGBM" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Link-Pro</span>
+<span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold uppercase tracking-tighter" style="">Lead Time: 1 Week</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">M12 Industrial Ethernet</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">Cat6a / 10Gbps Rated</span>
+<span class="text-xs font-medium text-slate-700" style="">Double Shielded (SF/UTP)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$85.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+<!-- Product Card 8 -->
+<div class="group relative bg-surface-container-lowest transition-all duration-300">
+<div class="aspect-square bg-white flex items-center justify-center p-8 overflow-hidden">
+<img alt="Safe-Stop Module" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="industrial safety relay module in bright yellow housing, wiring terminals visible, macro view of safety automation component" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvSTyy2_0xWKN4s772jmSaCqUwg0qC3ApOvqovXF-x1SBPC6usDp9xfYuXh4lyesWR7N6chFJXmvolti32LhuGtOWJhQhHNNy3NfFQXdtkhRuOET_6FH1BbfojM_wHbSmgtepjWnwcl25t8QJ6BO-peD-O78LHR7iN-6WftE7JvrWDM3Cs5O9f3BC0nDjG7TN5u8iHj2B-gIM8Swp2_j1xLmhz9U9Ft4qidpBt00ApZyyALnkcHajyTqFT75Fri1EUDuLJYXAnFwtF" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase" style="">Safe-Guard</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold uppercase tracking-tighter" style="">In Stock</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-4 uppercase tracking-tight" style="">Emergency Stop Relay</h3>
+<div class="bg-surface-container-low p-3 mb-6 flex flex-col gap-1">
+<span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" style="">Specifications</span>
+<span class="text-xs font-medium text-slate-700" style="">PLe / Category 4 Safety</span>
+<span class="text-xs font-medium text-slate-700" style="">Dual Channel Monitoring</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xl font-black tracking-tighter text-on-surface" style="">$275.00</span>
+<button class="bg-primary-container text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors" style="">Add to Quote</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-900 dark:bg-black text-xs font-mono tracking-widest uppercase flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full">
+<div class="mb-6 md:mb-0">
+<span class="text-lg font-bold text-white mb-2 block" style="">Stalux Automation</span>
+<p class="text-slate-400" style="">© 2024 Stalux Automation. Engineered for Excellence.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-slate-400 hover:text-red-500 transition-colors opacity-80 hover:opacity-100" href="#" style="">Privacy Policy</a>
+<a class="text-slate-400 hover:text-red-500 transition-colors opacity-80 hover:opacity-100" href="#" style="">Terms of Service</a>
+<a class="text-slate-400 hover:text-red-500 transition-colors opacity-80 hover:opacity-100" href="#" style="">Technical Docs</a>
+<a class="text-slate-400 hover:text-red-500 transition-colors opacity-80 hover:opacity-100" href="#" style="">Contact Engineering</a>
+</div>
+</footer>
+</body></html>

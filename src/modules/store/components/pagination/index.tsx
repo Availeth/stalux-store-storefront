@@ -6,11 +6,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 export function Pagination({
   page,
   totalPages,
-  'data-testid': dataTestid
+  variant = "default",
+  "data-testid": dataTestid,
 }: {
   page: number
   totalPages: number
-  'data-testid'?: string
+  variant?: "default" | "catalog"
+  "data-testid"?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -35,8 +37,16 @@ export function Pagination({
   ) => (
     <button
       key={p}
-      className={clx("txt-xlarge-plus text-ui-fg-muted", {
-        "text-ui-fg-base hover:text-ui-fg-subtle": isCurrent,
+      className={clx({
+        "txt-xlarge-plus text-ui-fg-muted text-ui-fg-base hover:text-ui-fg-subtle":
+          variant === "default" && isCurrent,
+        "txt-xlarge-plus text-ui-fg-muted": variant === "default" && !isCurrent,
+        "inline-flex min-h-9 min-w-9 items-center justify-center border text-[11px] font-bold uppercase tracking-[0.14em]":
+          variant === "catalog",
+        "border-[#a51634] bg-[#a51634] text-white":
+          variant === "catalog" && isCurrent,
+        "border-[#d2dae6] bg-white text-[#516177] hover:border-[#a51634] hover:text-[#a51634]":
+          variant === "catalog" && !isCurrent,
       })}
       disabled={isCurrent}
       onClick={() => handlePageChange(p)}
@@ -49,7 +59,10 @@ export function Pagination({
   const renderEllipsis = (key: string) => (
     <span
       key={key}
-      className="txt-xlarge-plus text-ui-fg-muted items-center cursor-default"
+      className={clx("items-center cursor-default", {
+        "txt-xlarge-plus text-ui-fg-muted": variant === "default",
+        "px-1 text-sm font-bold text-[#8a97a9]": variant === "catalog",
+      })}
     >
       ...
     </span>
@@ -107,8 +120,21 @@ export function Pagination({
 
   // Render the component
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid={dataTestid}>{renderPageButtons()}</div>
+    <div
+      className={clx("w-full", {
+        "mt-12 flex justify-center": variant === "default",
+        "mt-10 flex justify-end": variant === "catalog",
+      })}
+    >
+      <div
+        className={clx("flex items-end", {
+          "gap-3": variant === "default",
+          "gap-2": variant === "catalog",
+        })}
+        data-testid={dataTestid}
+      >
+        {renderPageButtons()}
+      </div>
     </div>
   )
 }

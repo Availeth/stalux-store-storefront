@@ -2,6 +2,7 @@ import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
+import CatalogProductCard from "@modules/store/components/catalog-product-card"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 const PRODUCT_LIMIT = 12
@@ -21,6 +22,7 @@ export default async function PaginatedProducts({
   categoryId,
   productsIds,
   countryCode,
+  view = "default",
 }: {
   sortBy?: SortOptions
   page: number
@@ -28,6 +30,7 @@ export default async function PaginatedProducts({
   categoryId?: string
   productsIds?: string[]
   countryCode: string
+  view?: "default" | "catalog"
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: 12,
@@ -65,17 +68,26 @@ export default async function PaginatedProducts({
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+  const isCatalogView = view === "catalog"
 
   return (
     <>
       <ul
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+        className={
+          isCatalogView
+            ? "grid w-full grid-cols-1 gap-x-6 gap-y-8 xsmall:grid-cols-2 medium:grid-cols-3 large:grid-cols-4"
+            : "grid w-full grid-cols-2 gap-x-6 gap-y-8 small:grid-cols-3 medium:grid-cols-4"
+        }
         data-testid="products-list"
       >
         {products.map((p) => {
           return (
             <li key={p.id}>
-              <ProductPreview product={p} region={region} />
+              {isCatalogView ? (
+                <CatalogProductCard product={p} />
+              ) : (
+                <ProductPreview product={p} region={region} />
+              )}
             </li>
           )
         })}
@@ -85,6 +97,7 @@ export default async function PaginatedProducts({
           data-testid="product-pagination"
           page={page}
           totalPages={totalPages}
+          variant={isCatalogView ? "catalog" : "default"}
         />
       )}
     </>
