@@ -99,7 +99,7 @@ export default function StaluxHome({
           </aside>
 
           <div className="space-y-16 md:space-y-24">
-            <section className="relative overflow-hidden rounded-2xl bg-[#f9f9fc]">
+            <section className="relative overflow-hidden rounded-2xl bg-[#f9f9fc]" >
               <div className="grid items-center gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-5">
                   <span className="inline-block bg-[#c41e3a] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.3em] text-white">
@@ -138,17 +138,17 @@ export default function StaluxHome({
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#f9f9fc]/45 to-transparent" />
                   </div>
-                  <div className="mt-5 rounded-xl bg-white p-6 shadow-[0_24px_50px_rgba(26,28,30,0.1)] lg:absolute lg:-bottom-10 lg:-left-10 lg:mt-0 lg:max-w-sm">
+                  <div className="mt-5 z-10 rounded-xl bg-white p-6 shadow-[0_24px_50px_rgba(26,28,30,0.1)] lg:absolute lg:-bottom-10 lg:-left-10 lg:mt-0 lg:max-w-sm">
                     <div className="mb-4 flex items-start justify-between">
                       <span className="text-xl font-black tracking-tight text-[#c41e3a]">
-                        S-SERIES 500
+                        Allen Bradley
                       </span>
                       <span className="bg-[#e8e8ea] px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
                         In Stock
                       </span>
                     </div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5b4040]">
-                      High Torque Servo Drive
+                      High Torque Servo Motor
                     </p>
                     <p className="mt-3 text-sm font-medium leading-relaxed text-[#5b4040]">
                       Optimized for high-speed pick-and-place deployments with
