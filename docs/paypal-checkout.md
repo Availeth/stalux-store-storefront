@@ -8,8 +8,10 @@ The PayPal Client Secret belongs only on the backend.
 The region must enable a PayPal provider (`pp_paypal_default` or
 `pp_paypal_paypal`). Payment session initialization must create a PayPal order
 and return its ID in `data.order_id`, `data.orderId`, or `data.id`.
-The session's `data.intent` must be `CAPTURE` for capture mode; otherwise the
-storefront requests authorization mode. This must match the backend's order.
+The storefront reads the intent from `data.intent` or `data.order.intent` (the
+format returned by our backend provider). `AUTHORIZE` selects authorization;
+otherwise it defaults to capture, matching our backend's `CAPTURE` orders.
+The SDK intent must match the backend's order or PayPal will close the popup.
 
 At Review, the official PayPal SDK opens approval for that existing order.
 After approval the storefront calls Medusa's cart completion action. The backend

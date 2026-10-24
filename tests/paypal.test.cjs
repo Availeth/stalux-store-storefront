@@ -138,6 +138,21 @@ test("opens the backend order with matching currency and intent; completes only 
   assert.deepEqual(state.calls, ["cart_checkout"])
 })
 
+test("matches the nested PayPal order intent returned by the backend", async () => {
+  for (const [data, intent] of [
+    [{ order_id: "paypal_order", order: { intent: "CAPTURE" } }, "capture"],
+    [{ order_id: "paypal_order", order: { intent: "AUTHORIZE" } }, "authorize"],
+    [{ order_id: "paypal_order", intent: "AUTHORIZE" }, "authorize"],
+    [{ order_id: "paypal_order", intent: "capture" }, "capture"],
+    [{ order_id: "paypal_order" }, "capture"],
+  ]) {
+    const state = checkout({ data })
+    assert.equal(state.options.intent, intent)
+    assert.equal(await state.buttons.createOrder(), "paypal_order")
+    assert.deepEqual(state.calls, [])
+  }
+})
+
 test("cancel and SDK errors keep checkout open and allow another approval", async () => {
   const state = checkout()
   state.buttons.onCancel()
@@ -202,7 +217,7 @@ test("authorized sessions resume cart completion and legacy order ID keys work",
   assert.deepEqual(state.calls, ["cart_checkout"])
   for (const data of [{ orderId: "legacy_order" }, { id: "legacy_order" }]) {
     const legacy = checkout({ data })
-    assert.equal(legacy.options.intent, "authorize")
+    assert.equal(legacy.options.intent, "capture")
     assert.equal(await legacy.buttons.createOrder(), "legacy_order")
   }
 })

@@ -31,8 +31,16 @@ const PayPalPaymentButton = (props: PayPalPaymentButtonProps) => {
   }
 
   const { paymentSession, cart } = props
+  // Our provider returns the PayPal API response under data.order. Match that
+  // order's intent; PayPal rejects approval when the SDK uses a different one.
+  const order = paymentSession.data?.order as
+    | { intent?: string }
+    | undefined
+  const orderIntent = paymentSession.data?.intent ?? order?.intent
   const intent =
-    paymentSession.data?.intent === "CAPTURE" ? "capture" : "authorize"
+    typeof orderIntent === "string" && orderIntent.toUpperCase() === "AUTHORIZE"
+      ? "authorize"
+      : "capture"
 
   return (
     <PayPalScriptProvider
