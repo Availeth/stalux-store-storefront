@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { shippingAddressError } from "@lib/util/shipping"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -339,7 +340,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -349,7 +350,9 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         first_name: formData.get("shipping_address.first_name"),
         last_name: formData.get("shipping_address.last_name"),
         address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
+        address_2: String(
+          formData.get("shipping_address.address_2") || ""
+        ).trim(),
         company: formData.get("shipping_address.company"),
         postal_code: formData.get("shipping_address.postal_code"),
         city: formData.get("shipping_address.city"),
@@ -359,6 +362,20 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       },
       email: formData.get("email"),
     } as any
+
+    for (const key of Object.keys(data.shipping_address)) {
+      data.shipping_address[key] = String(
+        data.shipping_address[key] || ""
+      ).trim()
+    }
+    data.shipping_address.country_code =
+      data.shipping_address.country_code.toLowerCase()
+    if (data.shipping_address.country_code === "us") {
+      data.shipping_address.province =
+        data.shipping_address.province.toUpperCase()
+    }
+    const addressError = shippingAddressError(data.shipping_address)
+    if (addressError) return addressError
 
     const sameAsBilling = formData.get("same_as_billing")
     if (sameAsBilling === "on") data.billing_address = data.shipping_address
