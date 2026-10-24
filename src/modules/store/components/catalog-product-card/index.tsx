@@ -4,6 +4,7 @@ import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { isProductInStock } from "@lib/util/catalog-filters"
 
 const formatMetadataKey = (key: string) => {
   return key
@@ -58,20 +59,7 @@ const getSpecificationLines = (product: HttpTypes.StoreProduct) => {
 }
 
 const getInventoryState = (product: HttpTypes.StoreProduct) => {
-  const inventoryValues = (product.variants ?? [])
-    .map((variant) => variant.inventory_quantity)
-    .filter((quantity): quantity is number => typeof quantity === "number")
-
-  if (inventoryValues.length === 0) {
-    return {
-      label: "In Stock",
-      className: "bg-[#e8f6ec] text-[#17763d]",
-    }
-  }
-
-  const hasInventory = inventoryValues.some((quantity) => quantity > 0)
-
-  if (hasInventory) {
+  if (isProductInStock(product)) {
     return {
       label: "In Stock",
       className: "bg-[#e8f6ec] text-[#17763d]",

@@ -5,188 +5,94 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  Transition,
 } from "@headlessui/react"
-import { Fragment, useEffect, useMemo, useState, useTransition } from "react"
+import { ChevronDownMini } from "@medusajs/icons"
 import { useRouter } from "next/navigation"
-import ReactCountryFlag from "react-country-flag"
+import { useState, useTransition } from "react"
 
-import { StateType } from "@lib/hooks/use-toggle-state"
-import { updateLocale } from "@lib/data/locale-actions"
 import { Locale } from "@lib/data/locales"
+import { updateLocale } from "@lib/data/locale-actions"
 
-type LanguageOption = {
-  code: string
-  name: string
-  localizedName: string
-  countryCode: string
-}
-
-const getCountryCodeFromLocale = (localeCode: string): string => {
-  try {
-    const locale = new Intl.Locale(localeCode)
-    if (locale.region) {
-      return locale.region.toUpperCase()
-    }
-    const maximized = locale.maximize()
-    return maximized.region?.toUpperCase() ?? localeCode.toUpperCase()
-  } catch {
-    const parts = localeCode.split(/[-_]/)
-    return parts.length > 1 ? parts[1].toUpperCase() : parts[0].toUpperCase()
-  }
-}
-
-type LanguageSelectProps = {
-  toggleState: StateType
-  locales: Locale[]
-  currentLocale: string | null
-}
-
-/**
- * Gets the localized display name for a language code using Intl API.
- * Falls back to the provided name if Intl is unavailable.
- */
-const getLocalizedLanguageName = (
-  code: string,
-  fallbackName: string,
-  displayLocale: string = "en-US"
-): string => {
-  try {
-    const displayNames = new Intl.DisplayNames([displayLocale], {
-      type: "language",
-    })
-    return displayNames.of(code) ?? fallbackName
-  } catch {
-    return fallbackName
-  }
-}
-
-const DEFAULT_OPTION: LanguageOption = {
-  code: "",
-  name: "Default",
-  localizedName: "Default",
-  countryCode: "",
-}
-
-const LanguageSelect = ({
-  toggleState,
+export default function LanguageSelect({
   locales,
   currentLocale,
-}: LanguageSelectProps) => {
-  const [current, setCurrent] = useState<LanguageOption | undefined>(undefined)
+}: {
+  locales: Locale[]
+  currentLocale: string | null
+}) {
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState("")
   const router = useRouter()
+  const options = [
+    { code: "", name: "Default" },
+    ...locales.map((locale) => {
+      let name = locale.name
+      try {
+        name =
+          new Intl.DisplayNames([currentLocale || "en-US"], {
+            type: "language",
+          }).of(locale.code) || locale.name
+      } catch {}
+      return { code: locale.code, name }
+    }),
+  ]
+  const selected =
+    options.find(
+      (option) => option.code.toLowerCase() === currentLocale?.toLowerCase()
+    ) || options[0]
 
-  const { state, close } = toggleState
-
-  const options = useMemo(() => {
-    const localeOptions = locales.map((locale) => ({
-      code: locale.code,
-      name: locale.name,
-      localizedName: getLocalizedLanguageName(
-        locale.code,
-        locale.name,
-        currentLocale ?? "en-US"
-      ),
-      countryCode: getCountryCodeFromLocale(locale.code),
-    }))
-    return [DEFAULT_OPTION, ...localeOptions]
-  }, [locales, currentLocale])
-
-  useEffect(() => {
-    if (currentLocale) {
-      const option = options.find(
-        (o) => o.code.toLowerCase() === currentLocale.toLowerCase()
-      )
-      setCurrent(option ?? DEFAULT_OPTION)
-    } else {
-      setCurrent(DEFAULT_OPTION)
-    }
-  }, [options, currentLocale])
-
-  const handleChange = (option: LanguageOption) => {
+  const handleChange = (code: string) => {
+    setError("")
     startTransition(async () => {
-      await updateLocale(option.code)
-      close()
-      router.refresh()
+      try {
+        await updateLocale(code)
+        router.refresh()
+      } catch {
+        setError("Unable to update your language. Please try again.")
+      }
     })
   }
 
   return (
     <div>
       <Listbox
-        as="span"
+        value={selected.code}
         onChange={handleChange}
-        defaultValue={
-          currentLocale
-            ? options.find(
-                (o) => o.code.toLowerCase() === currentLocale.toLowerCase()
-              ) ?? DEFAULT_OPTION
-            : DEFAULT_OPTION
-        }
         disabled={isPending}
       >
-        <ListboxButton className="py-1 w-full">
-          <div className="txt-compact-small flex items-start gap-x-2">
-            <span>Language:</span>
-            {current && (
-              <span className="txt-compact-small flex items-center gap-x-2">
-                {current.countryCode && (
-                  /* @ts-ignore */
-                  <ReactCountryFlag
-                    svg
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                    }}
-                    countryCode={current.countryCode}
-                  />
-                )}
-                {isPending ? "..." : current.localizedName}
-              </span>
-            )}
-          </div>
-        </ListboxButton>
-        <div className="flex relative w-full min-w-[320px]">
-          <Transition
-            show={state}
-            as={Fragment}
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+        <div className="relative">
+          <ListboxButton
+            aria-label="Language"
+            className="flex w-full items-center justify-between gap-3 rounded-base border border-[#dce3ec] bg-white px-3 py-3 text-left text-sm disabled:opacity-60"
           >
-            <ListboxOptions
-              className="absolute -bottom-[calc(100%-36px)] left-0 xsmall:left-auto xsmall:right-0 max-h-[442px] overflow-y-scroll z-[900] bg-white drop-shadow-md text-small-regular uppercase text-black no-scrollbar rounded-rounded w-full"
-              static
-            >
-              {options.map((o) => (
-                <ListboxOption
-                  key={o.code || "default"}
-                  value={o}
-                  className="py-2 hover:bg-gray-200 px-3 cursor-pointer flex items-center gap-x-2"
-                >
-                  {o.countryCode ? (
-                    /* @ts-ignore */
-                    <ReactCountryFlag
-                      svg
-                      style={{
-                        width: "16px",
-                        height: "16px",
-                      }}
-                      countryCode={o.countryCode}
-                    />
-                  ) : (
-                    <span style={{ width: "16px", height: "16px" }} />
-                  )}
-                  {o.localizedName}
-                </ListboxOption>
-              ))}
-            </ListboxOptions>
-          </Transition>
+            <span>
+              <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-[#758296]">
+                Language
+              </span>
+              <span className="font-medium">
+                {isPending ? "Updating..." : selected.name}
+              </span>
+            </span>
+            <ChevronDownMini className="h-4 w-4" aria-hidden="true" />
+          </ListboxButton>
+          <ListboxOptions className="absolute bottom-full z-10 mb-2 max-h-56 w-full overflow-y-auto rounded-base border border-[#dce3ec] bg-white p-1 shadow-xl focus:outline-none">
+            {options.map((option) => (
+              <ListboxOption
+                key={option.code}
+                value={option.code}
+                className="cursor-pointer rounded-base px-3 py-2.5 text-sm data-[focus]:bg-[#edf1f6] data-[selected]:font-semibold data-[selected]:text-[#c21d2e]"
+              >
+                {option.name}
+              </ListboxOption>
+            ))}
+          </ListboxOptions>
         </div>
       </Listbox>
+      {error && (
+        <p role="alert" className="mt-2 text-xs text-[#c21d2e]">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
-
-export default LanguageSelect

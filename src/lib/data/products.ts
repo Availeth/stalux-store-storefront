@@ -2,6 +2,10 @@
 
 import { sdk } from "@lib/config"
 import { sortProducts } from "@lib/util/sort-products"
+import {
+  CatalogFilters,
+  productMatchesCatalogFilters,
+} from "@lib/util/catalog-filters"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
@@ -63,7 +67,7 @@ export const listProducts = async ({
           offset,
           region_id: region?.id,
           fields:
-            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,",
+            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,+variants.metadata,*variants.options",
           ...queryParams,
         },
         headers,
@@ -86,42 +90,66 @@ export const listProducts = async ({
 }
 
 /**
- * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
- * It will then return the paginated products based on the page and limit parameters.
+ * Apply specification filters and price sorting before pagination so counts and
+ * page contents describe the same complete result set.
  */
 export const listProductsWithSort = async ({
-  page = 0,
+  page = 1,
   queryParams,
   sortBy = "created_at",
   countryCode,
+  filters,
 }: {
   page?: number
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
   sortBy?: SortOptions
   countryCode: string
+  filters?: CatalogFilters
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
 }> => {
   const limit = queryParams?.limit || 12
 
-  const {
-    response: { products, count },
-  } = await listProducts({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      limit: 100,
-    },
-    countryCode,
-  })
+  const currentPage = Math.max(1, page)
+  const hasLocalFilters = Boolean(
+    filters?.voltage || filters?.ip || filters?.inStock
+  )
+  if (sortBy === "created_at" && !hasLocalFilters) {
+    return listProducts({
+      pageParam: currentPage,
+      queryParams: { ...queryParams, order: "-created_at" },
+      countryCode,
+    })
+  }
 
-  const sortedProducts = sortProducts(products, sortBy)
+  const products: HttpTypes.StoreProduct[] = []
+  let batchPage = 1
+  let nextBatch: number | null = 1
 
-  const pageParam = (page - 1) * limit
+  while (nextBatch !== null) {
+    const batch = await listProducts({
+      pageParam: batchPage,
+      queryParams: { ...queryParams, limit: 100 },
+      countryCode,
+    })
+    products.push(...batch.response.products)
+    nextBatch = batch.response.products.length ? batch.nextPage : null
+    batchPage += 1
+  }
 
-  const nextPage = count > pageParam + limit ? pageParam + limit : null
+  const matchingProducts = filters
+    ? products.filter((product) =>
+        productMatchesCatalogFilters(product, filters)
+      )
+    : products
+  const count = matchingProducts.length
+  const sortedProducts = sortProducts(matchingProducts, sortBy)
+
+  const pageParam = (currentPage - 1) * limit
+
+  const nextPage = count > pageParam + limit ? currentPage + 1 : null
 
   const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit)
 

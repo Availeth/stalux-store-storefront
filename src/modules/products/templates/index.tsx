@@ -11,8 +11,6 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
-import ProductActionsWrapper from "./product-actions-wrapper"
-
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
@@ -60,23 +58,24 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
         <section className="grid grid-cols-1 gap-8 small:grid-cols-12 small:gap-12">
           <div className="small:col-span-7">
-            <ImageGallery images={images} productTitle={product.title} />
+            <ImageGallery
+              images={images}
+              variants={product.variants?.map(({ id, images }) => ({
+                id,
+                images,
+              }))}
+              productTitle={product.title}
+            />
           </div>
 
           <div className="small:col-span-5">
             <div className="flex flex-col gap-8 small:sticky small:top-32">
               <ProductInfo product={product} />
-              <Suspense
-                fallback={
-                  <ProductActions
-                    disabled={true}
-                    product={product}
-                    region={region}
-                  />
-                }
-              >
-                <ProductActionsWrapper id={product.id} region={region} />
-              </Suspense>
+              <ProductActions
+                key={product.id}
+                product={product}
+                region={region}
+              />
               <ProductOnboardingCta />
             </div>
           </div>

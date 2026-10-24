@@ -33,9 +33,12 @@ export const listOrders = async (
   limit: number = 10,
   offset: number = 0,
   filters?: Record<string, any>
-) => {
-  const headers = {
-    ...(await getAuthHeaders()),
+): Promise<HttpTypes.StoreOrder[] | null> => {
+  const headers = await getAuthHeaders()
+
+  // Parallel account routes can render while the sign-in form is visible.
+  if (!("authorization" in headers)) {
+    return null
   }
 
   const next = {
@@ -57,7 +60,14 @@ export const listOrders = async (
       cache: "force-cache",
     })
     .then(({ orders }) => orders)
-    .catch((err) => medusaError(err))
+    .catch((err) => {
+      // An expired session is expected here; the account layout shows sign-in.
+      if (err.status === 401 || err.response?.status === 401) {
+        return null
+      }
+
+      return medusaError(err)
+    })
 }
 
 export const createTransferRequest = async (

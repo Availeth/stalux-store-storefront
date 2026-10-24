@@ -53,17 +53,17 @@ export async function retrieveCart(cartId?: string, fields?: string) {
 }
 
 export async function getOrSetCart(countryCode: string) {
-  const region = await getRegion(countryCode)
+  const [region, existingCart, headers] = await Promise.all([
+    getRegion(countryCode),
+    retrieveCart(undefined, "id,region_id"),
+    getAuthHeaders(),
+  ])
 
   if (!region) {
     throw new Error(`Region not found for country code: ${countryCode}`)
   }
 
-  let cart = await retrieveCart(undefined, "id,region_id")
-
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
+  let cart = existingCart
 
   if (!cart) {
     const locale = await getLocale()

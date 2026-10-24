@@ -1,194 +1,264 @@
 "use client"
 
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from "@headlessui/react"
+import { Transition } from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
-import { ShoppingCart } from "@medusajs/icons"
+import { ArrowRightMini, ShoppingCart, XMark } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
 import DeleteButton from "@modules/common/components/delete-button"
-import LineItemOptions from "@modules/common/components/line-item-options"
-import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
-import { Fragment, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useId, useRef, useState } from "react"
 
-const CartDropdown = ({
+export default function CartDropdown({
   cart: cartState,
 }: {
   cart?: HttpTypes.StoreCart | null
-}) => {
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined
-  )
-  const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
-
-  const open = () => setCartDropdownOpen(true)
-  const close = () => setCartDropdownOpen(false)
-
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const panelId = useId()
+  const pathname = usePathname()
   const totalItems =
-    cartState?.items?.reduce((acc, item) => {
-      return acc + item.quantity
-    }, 0) || 0
-
+    cartState?.items?.reduce((total, item) => total + item.quantity, 0) || 0
+  const previousTotal = useRef(totalItems)
   const subtotal = cartState?.subtotal ?? 0
-  const itemRef = useRef<number>(totalItems || 0)
+  const items = [...(cartState?.items || [])].sort(
+    (a, b) =>
+      new Date(b.created_at ?? 0).getTime() -
+      new Date(a.created_at ?? 0).getTime()
+  )
 
-  const timedOpen = () => {
-    open()
-
-    const timer = setTimeout(close, 5000)
-
-    setActiveTimer(timer)
+  const cancelTimer = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = null
+  }, [])
+  const close = useCallback(() => {
+    cancelTimer()
+    setIsOpen(false)
+  }, [cancelTimer])
+  const open = () => {
+    cancelTimer()
+    setIsOpen(true)
+  }
+  const scheduleClose = () => {
+    cancelTimer()
+    timerRef.current = setTimeout(() => {
+      if (!rootRef.current?.contains(document.activeElement)) setIsOpen(false)
+    }, 180)
   }
 
-  const openAndCancel = () => {
-    if (activeTimer) {
-      clearTimeout(activeTimer)
-    }
-
-    open()
-  }
-
-  // Clean up the timer when the component unmounts
   useEffect(() => {
-    return () => {
-      if (activeTimer) {
-        clearTimeout(activeTimer)
+    close()
+  }, [pathname, close])
+
+  useEffect(() => {
+    if (
+      previousTotal.current !== totalItems &&
+      !pathname.includes("/cart") &&
+      window.matchMedia("(min-width: 1024px)").matches
+    ) {
+      cancelTimer()
+      setIsOpen(true)
+      timerRef.current = setTimeout(() => {
+        if (
+          !rootRef.current?.matches(":hover") &&
+          !rootRef.current?.contains(document.activeElement)
+        )
+          setIsOpen(false)
+      }, 5000)
+    }
+    previousTotal.current = totalItems
+  }, [totalItems, pathname, cancelTimer])
+
+  useEffect(() => cancelTimer, [cancelTimer])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !rootRef.current?.contains(event.target)
+      )
+        close()
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        close()
+        buttonRef.current?.focus()
       }
     }
-  }, [activeTimer])
-
-  const pathname = usePathname()
-
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
-  useEffect(() => {
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
-      timedOpen()
+    document.addEventListener("pointerdown", handlePointerDown)
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown)
+      document.removeEventListener("keydown", handleKeyDown)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  }, [isOpen, close])
+
+  const cartIcon = (
+    <>
+      <ShoppingCart className="h-6 w-6" aria-hidden="true" />
+      <span
+        aria-hidden="true"
+        className="absolute right-0 top-0 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#c21d2e] px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white"
+      >
+        {totalItems}
+      </span>
+    </>
+  )
+  const triggerClass =
+    "relative h-11 w-11 items-center justify-center rounded-base text-[#1b3f73] transition-colors hover:bg-[#edf1f6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1b3f73]"
 
   return (
     <div
-      className="h-full z-50"
-      onMouseEnter={openAndCancel}
-      onMouseLeave={close}
+      ref={rootRef}
+      className="relative"
+      onPointerEnter={(event) => {
+        if (
+          event.pointerType === "mouse" &&
+          window.matchMedia("(min-width: 1024px)").matches
+        )
+          open()
+      }}
+      onPointerLeave={scheduleClose}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) close()
+      }}
     >
-      <Popover className="relative h-full">
-        <PopoverButton className="h-full flex items-center">
-          <LocalizedClientLink
-            className="relative inline-flex h-9 w-9 items-center justify-center text-[#1b3f73] transition-colors duration-200 hover:text-[#122d55] xsmall:h-10 xsmall:w-10"
-            href="/cart"
-            data-testid="nav-cart-link"
-          >
-            <ShoppingCart className="h-7 w-7 xsmall:h-8 xsmall:w-8" />
-            <span className="absolute -right-1 -top-1 inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-[#d51f36] px-1 text-[10px] font-bold leading-none text-white">
-              {totalItems}
-            </span>
-            <span className="sr-only">{`Cart (${totalItems})`}</span>
-          </LocalizedClientLink>
-        </PopoverButton>
-        <Transition
-          show={cartDropdownOpen}
-          as={Fragment}
-          enter="transition ease-out duration-200"
-          enterFrom="opacity-0 translate-y-1"
-          enterTo="opacity-100 translate-y-0"
-          leave="transition ease-in duration-150"
-          leaveFrom="opacity-100 translate-y-0"
-          leaveTo="opacity-0 translate-y-1"
+      <LocalizedClientLink
+        href="/cart"
+        aria-label={`Cart (${totalItems})`}
+        data-testid="nav-cart-link"
+        className={`inline-flex small:hidden ${triggerClass}`}
+      >
+        {cartIcon}
+      </LocalizedClientLink>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-label={`Open cart (${totalItems} ${
+          totalItems === 1 ? "item" : "items"
+        })`}
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? panelId : undefined}
+        data-testid="nav-cart-button"
+        className={`hidden small:inline-flex ${triggerClass}`}
+        onClick={open}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault()
+            open()
+          }
+        }}
+      >
+        {cartIcon}
+      </button>
+
+      <Transition
+        show={isOpen}
+        enter="transition duration-150 ease-out motion-reduce:transition-none"
+        enterFrom="translate-y-2 opacity-0"
+        enterTo="translate-y-0 opacity-100"
+        leave="transition duration-100 ease-in motion-reduce:transition-none"
+        leaveFrom="translate-y-0 opacity-100"
+        leaveTo="translate-y-2 opacity-0"
+      >
+        <div
+          className="absolute right-0 top-full z-[60] hidden w-[390px] max-w-[calc(100vw-3rem)] pt-3 small:block"
+          data-testid="nav-cart-dropdown"
         >
-          <PopoverPanel
-            static
-            className="hidden small:block absolute top-[calc(100%+8px)] right-0 bg-white border border-gray-200 w-[420px] text-ui-fg-base shadow-lg"
-            data-testid="nav-cart-dropdown"
+          <section
+            id={panelId}
+            aria-label="Shopping cart preview"
+            className="overflow-hidden rounded-rounded border border-[#dce3ec] bg-white text-[#1b3f73] shadow-[0_18px_60px_-12px_rgba(16,37,62,0.25)]"
           >
-            <div className="p-4 flex items-center justify-center">
-              <h3 className="text-large-semi">Cart</h3>
+            <div className="flex items-center justify-between border-b border-[#e1e7ee] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-base font-semibold">Your cart</h2>
+                <span className="rounded-full bg-[#edf1f6] px-2 py-1 text-[10px] font-semibold">
+                  {totalItems} {totalItems === 1 ? "item" : "items"}
+                </span>
+              </div>
+              <button
+                type="button"
+                aria-label="Close cart preview"
+                onClick={close}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#758296] hover:bg-[#edf1f6]"
+              >
+                <XMark className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
-            {cartState && cartState.items?.length ? (
+            {items.length && cartState ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
-                  {cartState.items
-                    .sort((a, b) => {
-                      return (a.created_at ?? "") > (b.created_at ?? "")
-                        ? -1
-                        : 1
-                    })
-                    .map((item) => (
-                      <div
-                        className="grid grid-cols-[122px_1fr] gap-x-4"
-                        key={item.id}
-                        data-testid="cart-item"
+                <div className="max-h-[min(22rem,45vh)] overflow-y-auto overscroll-contain divide-y divide-[#e1e7ee] px-5">
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      data-testid="cart-item"
+                      className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-4 py-5"
+                    >
+                      <LocalizedClientLink
+                        href={`/products/${item.product_handle}`}
+                        onClick={close}
+                        aria-label={item.title}
                       >
+                        <Thumbnail
+                          thumbnail={item.thumbnail}
+                          images={item.variant?.product?.images}
+                          size="square"
+                          className="rounded-base border border-[#e1e7ee] !p-2 !shadow-none"
+                        />
+                      </LocalizedClientLink>
+                      <div className="min-w-0">
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-24"
+                          onClick={close}
+                          data-testid="product-link"
+                          className="line-clamp-2 text-sm font-semibold leading-snug hover:text-[#c21d2e]"
                         >
-                          <Thumbnail
-                            thumbnail={item.thumbnail}
-                            images={item.variant?.product?.images}
-                            size="square"
-                          />
+                          {item.title}
                         </LocalizedClientLink>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                <h3 className="text-base-regular overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink
-                                    href={`/products/${item.product_handle}`}
-                                    data-testid="product-link"
-                                  >
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                <LineItemOptions
-                                  variant={item.variant}
-                                  data-testid="cart-item-variant"
-                                  data-value={item.variant}
-                                />
-                                <span
-                                  data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
-                                >
-                                  Quantity: {item.quantity}
-                                </span>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice
-                                  item={item}
-                                  style="tight"
-                                  currencyCode={cartState.currency_code}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <DeleteButton
-                            id={item.id}
-                            className="mt-1"
-                            data-testid="cart-item-remove-button"
+                        {item.variant?.title &&
+                          item.variant.title !== "Default Variant" && (
+                            <p
+                              data-testid="cart-item-variant"
+                              className="mt-1 truncate text-xs text-[#758296]"
+                            >
+                              {item.variant.title}
+                            </p>
+                          )}
+                        <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+                          <span
+                            data-testid="cart-item-quantity"
+                            className="text-[#758296]"
                           >
-                            Remove
-                          </DeleteButton>
+                            Qty {item.quantity}
+                          </span>
+                          <span
+                            data-testid="product-price"
+                            className="font-semibold"
+                          >
+                            {convertToLocale({
+                              amount: item.total ?? 0,
+                              currency_code: cartState.currency_code,
+                            })}
+                          </span>
                         </div>
+                        <DeleteButton id={item.id} className="mt-2 text-xs">
+                          Remove
+                        </DeleteButton>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
-                <div className="p-4 flex flex-col gap-y-4 text-small-regular">
-                  <div className="flex items-center justify-between">
-                    <span className="text-ui-fg-base font-semibold">
-                      Subtotal{" "}
-                      <span className="font-normal">(excl. taxes)</span>
-                    </span>
+                <div className="border-t border-[#e1e7ee] bg-[#f7f9fc] px-5 py-4">
+                  <div className="flex items-center justify-between text-sm font-semibold">
+                    <span>Subtotal</span>
                     <span
-                      className="text-large-semi"
+                      className="text-lg"
                       data-testid="cart-subtotal"
                       data-value={subtotal}
                     >
@@ -198,40 +268,47 @@ const CartDropdown = ({
                       })}
                     </span>
                   </div>
-                  <LocalizedClientLink href="/cart" passHref>
-                    <Button
-                      className="w-full"
-                      size="large"
-                      data-testid="go-to-cart-button"
-                    >
-                      Go to cart
-                    </Button>
+                  <p className="mt-1 text-[11px] text-[#758296]">
+                    Shipping and taxes calculated at checkout.
+                  </p>
+                  <LocalizedClientLink
+                    href="/cart"
+                    onClick={close}
+                    data-testid="go-to-cart-button"
+                    className="mt-4 flex h-11 items-center justify-between rounded-base bg-[#c21d2e] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#a41626]"
+                  >
+                    View cart
+                    <ArrowRightMini className="h-5 w-5" aria-hidden="true" />
                   </LocalizedClientLink>
                 </div>
               </>
             ) : (
-              <div>
-                <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
-                  <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 rounded-full text-white">
-                    <span>0</span>
-                  </div>
-                  <span>Your shopping bag is empty.</span>
-                  <div>
-                    <LocalizedClientLink href="/store">
-                      <>
-                        <span className="sr-only">Go to all products page</span>
-                        <Button onClick={close}>Explore products</Button>
-                      </>
-                    </LocalizedClientLink>
-                  </div>
+              <div className="px-6 py-8 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f0f4f9]">
+                  <ShoppingCart
+                    className="h-7 w-7 text-[#7c91ac]"
+                    aria-hidden="true"
+                  />
                 </div>
+                <h3 className="text-base font-semibold">
+                  Ready for your next project?
+                </h3>
+                <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-relaxed text-[#758296]">
+                  Your cart is empty. Find the right components in our catalog.
+                </p>
+                <LocalizedClientLink
+                  href="/store"
+                  onClick={close}
+                  className="mt-6 flex h-11 items-center justify-between rounded-base bg-[#c21d2e] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#a41626]"
+                >
+                  Explore products
+                  <ArrowRightMini className="h-5 w-5" aria-hidden="true" />
+                </LocalizedClientLink>
               </div>
             )}
-          </PopoverPanel>
-        </Transition>
-      </Popover>
+          </section>
+        </div>
+      </Transition>
     </div>
   )
 }
-
-export default CartDropdown

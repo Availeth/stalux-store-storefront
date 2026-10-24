@@ -1,13 +1,29 @@
+"use client"
+
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
+  variants?: Pick<HttpTypes.StoreProductVariant, "id" | "images">[] | null
   productTitle: string
 }
 
-const ImageGallery = ({ images, productTitle }: ImageGalleryProps) => {
-  const galleryImages = images.filter(
+const ImageGallery = ({
+  images,
+  variants,
+  productTitle,
+}: ImageGalleryProps) => {
+  const selectedVariantId = useSearchParams().get("v_id")
+  const variantImages = variants?.find(
+    (v) => v.id === selectedVariantId
+  )?.images
+  const selectedImageIds = new Set(variantImages?.map((image) => image.id))
+  const displayedImages = selectedImageIds.size
+    ? images.filter((image) => selectedImageIds.has(image.id))
+    : images
+  const galleryImages = displayedImages.filter(
     (
       image
     ): image is HttpTypes.StoreProductImage & {

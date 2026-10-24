@@ -16,7 +16,6 @@ const categoryLinks = [
   { label: "Sensors", href: "/store" },
 ]
 
-
 const withCountryCode = (countryCode: string, path: string) =>
   `/${countryCode}${path}`
 
@@ -99,7 +98,7 @@ export default function StaluxHome({
           </aside>
 
           <div className="space-y-16 md:space-y-24">
-            <section className="relative overflow-hidden rounded-2xl bg-[#f9f9fc]" >
+            <section className="relative overflow-hidden rounded-2xl bg-[#f9f9fc]">
               <div className="grid items-center gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-5">
                   <span className="inline-block bg-[#c41e3a] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.3em] text-white">
@@ -279,8 +278,8 @@ export default function StaluxHome({
                       productStatus === "Low Stock"
                         ? "bg-[#ffdad6] text-[#93000a]"
                         : productStatus === "Out of Stock"
-                          ? "bg-[#1a1c1e] text-white"
-                          : "bg-[#e8e8ea] text-[#1a1c1e]"
+                        ? "bg-[#1a1c1e] text-white"
+                        : "bg-[#e8e8ea] text-[#1a1c1e]"
                     const productHref = product.handle
                       ? withCountryCode(
                           countryCode,
@@ -289,7 +288,10 @@ export default function StaluxHome({
                       : withCountryCode(countryCode, "/store")
 
                     return (
-                      <article
+                      <Link
+                        href={productHref}
+                        prefetch={true}
+                        aria-label={`Shop ${product.title}`}
                         key={product.id}
                         className="flex h-full flex-col bg-white p-6 md:p-8"
                       >
@@ -348,16 +350,15 @@ export default function StaluxHome({
                                 {price?.calculated_price || "Contact Sales"}
                               </span>
                             </div>
-                            <Link
-                              href={productHref}
+                            <span
+                              aria-hidden="true"
                               className="inline-flex h-11 w-11 items-center justify-center bg-[#1a1c1e] text-white transition hover:bg-[#c41e3a]"
-                              aria-label={`Shop ${product.title}`}
                             >
                               <ShoppingCart className="h-5 w-5" />
-                            </Link>
+                            </span>
                           </div>
                         </div>
-                      </article>
+                      </Link>
                     )
                   })}
                 </div>

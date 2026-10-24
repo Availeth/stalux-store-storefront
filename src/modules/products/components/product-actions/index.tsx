@@ -7,12 +7,7 @@ import { Button, clx } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
@@ -36,21 +31,21 @@ export default function ProductActions({
   product,
   disabled,
 }: ProductActionsProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [options, setOptions] = useState<Record<string, string | undefined>>({})
-  const [isAdding, setIsAdding] = useState(false)
-  const countryCode = useParams().countryCode as string
-
-  // If there is only 1 variant, preselect the options
-  useEffect(() => {
-    if (product.variants?.length === 1) {
-      const variantOptions = optionsAsKeymap(product.variants[0].options)
-      setOptions(variantOptions ?? {})
+  const [options, setOptions] = useState<Record<string, string | undefined>>(
+    () => {
+      const variant =
+        product.variants?.find(
+          (variant) => variant.id === searchParams.get("v_id")
+        ) ?? (product.variants?.length === 1 ? product.variants[0] : undefined)
+      return optionsAsKeymap(variant?.options ?? null) ?? {}
     }
-  }, [product.variants])
+  )
+  const [isAdding, setIsAdding] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const countryCode = useParams().countryCode as string
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -93,8 +88,11 @@ export default function ProductActions({
       params.delete("v_id")
     }
 
-    router.replace(pathname + "?" + params.toString())
-  }, [isValidVariant, pathname, router, searchParams, selectedVariant])
+    // Variant data is already loaded. Keep the URL and gallery in sync without
+    // another server render or interrupting an in-flight cart action.
+    const query = params.toString()
+    window.history.replaceState(null, "", pathname + (query ? "?" + query : ""))
+  }, [isValidVariant, pathname, searchParams, selectedVariant])
 
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
@@ -130,14 +128,23 @@ export default function ProductActions({
     if (!selectedVariant?.id) return null
 
     setIsAdding(true)
+    setError(null)
 
-    await addToCart({
-      variantId: selectedVariant.id,
-      quantity: 1,
-      countryCode,
-    })
-
-    setIsAdding(false)
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity: 1,
+        countryCode,
+      })
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to add to cart. Please try again."
+      )
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   return (
@@ -207,6 +214,12 @@ export default function ProductActions({
               ? "Out of Stock"
               : "Add to Cart"}
           </Button>
+
+          {error && (
+            <p role="alert" className="mt-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
 
           <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5b4040]">
             Secure checkout • Global dispatch • OEM support
