@@ -4,7 +4,8 @@ import React, { useContext, useMemo, type JSX } from "react"
 
 import Radio from "@modules/common/components/radio"
 
-import { isManual } from "@lib/constants"
+import { isManual, isPaypal } from "@lib/constants"
+import PayPal from "@modules/common/icons/paypal"
 import SkeletonCardDetails from "@modules/skeletons/components/skeleton-card-details"
 import { CardElement } from "@stripe/react-stripe-js"
 import { StripeCardElementOptions } from "@stripe/stripe-js"
@@ -27,6 +28,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   children,
 }) => {
   const isDevelopment = process.env.NODE_ENV === "development"
+  const paypal = isPaypal(paymentProviderId)
 
   return (
     <RadioGroupOption
@@ -45,14 +47,16 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         <div className="flex items-center gap-x-4">
           <Radio checked={selectedPaymentOptionId === paymentProviderId} />
           <Text className="text-base-regular">
-            {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
+            {paypal
+              ? "PayPal"
+              : paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
           </Text>
           {isManual(paymentProviderId) && isDevelopment && (
             <PaymentTest className="hidden small:block" />
           )}
         </div>
         <span className="justify-self-end text-ui-fg-base">
-          {paymentInfoMap[paymentProviderId]?.icon}
+          {paypal ? <PayPal /> : paymentInfoMap[paymentProviderId]?.icon}
         </span>
       </div>
       {isManual(paymentProviderId) && isDevelopment && (

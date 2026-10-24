@@ -5,19 +5,20 @@ const PayPal = () => {
       height="20"
       width="20"
       viewBox="0 0 26 25"
-      id="paypalIcon"
+      role="img"
+      aria-label="PayPal"
     >
       <path
-        fill="none"
-        stroke="#303c42"
+        fill="#003087"
+        stroke="#003087"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M6.9 20.5H2c-.6 0-.5-.1-.5-.5s2.9-18 3-18.5.5-1 1-1h10c2.8 0 5 2.2 5 5h0c0 4.4-3.6 8-8 8H7.9"
       ></path>
       <path
-        fill="none"
-        stroke="#303c42"
+        fill="#009cde"
+        stroke="#009cde"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -6,6 +6,7 @@ import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
+import StateSelect from "../state-select"
 
 const ShippingAddress = ({
   customer,
@@ -22,6 +23,7 @@ const ShippingAddress = ({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
     "shipping_address.last_name": cart?.shipping_address?.last_name || "",
     "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
+    "shipping_address.address_2": cart?.shipping_address?.address_2 || "",
     "shipping_address.company": cart?.shipping_address?.company || "",
     "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
     "shipping_address.city": cart?.shipping_address?.city || "",
@@ -55,6 +57,7 @@ const ShippingAddress = ({
         "shipping_address.first_name": address?.first_name || "",
         "shipping_address.last_name": address?.last_name || "",
         "shipping_address.address_1": address?.address_1 || "",
+        "shipping_address.address_2": address?.address_2 || "",
         "shipping_address.company": address?.company || "",
         "shipping_address.postal_code": address?.postal_code || "",
         "shipping_address.city": address?.city || "",
@@ -79,7 +82,7 @@ const ShippingAddress = ({
     if (cart && !cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
-  }, [cart]) // Add cart as a dependency
+  }, [cart, customer?.email])
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -139,6 +142,14 @@ const ShippingAddress = ({
           data-testid="shipping-address-input"
         />
         <Input
+          label="Apartment, suite, etc. (optional)"
+          name="shipping_address.address_2"
+          autoComplete="address-line2"
+          value={formData["shipping_address.address_2"]}
+          onChange={handleChange}
+          data-testid="shipping-address-2-input"
+        />
+        <Input
           label="Company"
           name="shipping_address.company"
           value={formData["shipping_address.company"]}
@@ -153,6 +164,12 @@ const ShippingAddress = ({
           value={formData["shipping_address.postal_code"]}
           onChange={handleChange}
           required
+          pattern={
+            formData["shipping_address.country_code"]?.toLowerCase() === "us"
+              ? "[0-9]{5}(-[0-9]{4})?"
+              : undefined
+          }
+          title="For US addresses, enter a five-digit ZIP or ZIP+4 code."
           data-testid="shipping-postal-code-input"
         />
         <Input
@@ -173,10 +190,9 @@ const ShippingAddress = ({
           required
           data-testid="shipping-country-select"
         />
-        <Input
-          label="State / Province"
+        <StateSelect
           name="shipping_address.province"
-          autoComplete="address-level1"
+          countryCode={formData["shipping_address.country_code"]}
           value={formData["shipping_address.province"]}
           onChange={handleChange}
           data-testid="shipping-province-input"

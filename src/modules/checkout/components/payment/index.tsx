@@ -21,7 +21,11 @@ const Payment = ({
   availablePaymentMethods: any[]
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
+    (paymentSession: any) =>
+      paymentSession.status === "pending" &&
+      availablePaymentMethods?.some(
+        (method) => method.id === paymentSession.provider_id
+      )
   )
 
   const [isLoading, setIsLoading] = useState(false)
@@ -103,6 +107,26 @@ const Payment = ({
   useEffect(() => {
     setError(null)
   }, [isOpen])
+
+  useEffect(() => {
+    // Existing carts can retain a session for a provider removed from the region.
+    if (
+      !availablePaymentMethods?.some(
+        (method) => method.id === selectedPaymentMethod
+      )
+    ) {
+      setSelectedPaymentMethod(
+        activeSession?.provider_id ??
+          (availablePaymentMethods?.length === 1
+            ? availablePaymentMethods[0].id
+            : "")
+      )
+    }
+  }, [
+    availablePaymentMethods,
+    activeSession?.provider_id,
+    selectedPaymentMethod,
+  ])
 
   return (
     <div className="bg-white">

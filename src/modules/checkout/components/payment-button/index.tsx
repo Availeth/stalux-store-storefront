@@ -1,12 +1,21 @@
 "use client"
 
-import { isManual, isStripeLike } from "@lib/constants"
+import { isManual, isPaypal, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
+import dynamic from "next/dynamic"
+
+const PayPalPaymentButton = dynamic(() => import("./paypal-payment-button"), {
+  loading: () => (
+    <Button disabled isLoading>
+      Loading PayPal
+    </Button>
+  ),
+})
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -24,9 +33,20 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const paymentSession = cart.payment_collection?.payment_sessions?.find(
+    (session) => session.status === "pending" || session.status === "authorized"
+  )
 
   switch (true) {
+    case isPaypal(paymentSession?.provider_id):
+      return (
+        <PayPalPaymentButton
+          notReady={notReady}
+          cart={cart}
+          paymentSession={paymentSession!}
+          data-testid={dataTestId}
+        />
+      )
     case isStripeLike(paymentSession?.provider_id):
       return (
         <StripePaymentButton
